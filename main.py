@@ -18,17 +18,10 @@ def log(*args, **kwargs):
 for i, k in enumerate(config):
     log("{}: {}".format(i, k))
 
-# print("请选择需要监控的账号：", end="")
-# account = input("")
-# print(account)
-
-
-
 
 class Monitor:
 
     checkouted = set()
-
 
     def __init__(self, cookie, classes):
 
@@ -85,16 +78,9 @@ class Monitor:
         else:
             return False
 
-        return 
-
-
-
-
 
 def account_task(account):
-
     monitor = Monitor(config[account]["cookie"], config[account]["classes"])
-
     while True:
         log("✊ 检查账号签到任务：", account)
         tasks = monitor.get_task_list()
@@ -103,7 +89,6 @@ def account_task(account):
                 log("✌️ 签到成功:", task["courseName"])
 
         time.sleep(10)
-
 
 for ac in config:
     log("📺 开始监控", ac)
