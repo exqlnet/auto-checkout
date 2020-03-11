@@ -90,12 +90,13 @@ def account_task(account):
 
         time.sleep(10)
 
-for ac in config:
-    log("📺 开始监控", ac)
-    thr = Thread(target=account_task, args=(ac,))
-    thr.start()
+if __name__ == "__main__":
+    for ac in config:
+        log("📺 开始监控", ac)
+        thr = Thread(target=account_task, args=(ac,))
+        thr.start()
 
-log("👌 线程启动完毕！")
+    log("👌 线程启动完毕！")
 
 
 
