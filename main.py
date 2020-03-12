@@ -79,11 +79,21 @@ class Monitor:
             return False
 
 
+    def check_expire(self):
+        url = "http://i.mooc.chaoxing.com/space/index"
+
+        return self.session.get(url, allow_redirects=False).status_code == 302
+
 def account_task(account):
     monitor = Monitor(config[account]["cookie"], config[account]["classes"])
+    if monitor.check_expire():
+        log("👮‍♀️ {}Cookie已过期，停止监控".format(account))
+        return
+    else:
+        log("✅ {}账号Cookie正常".format(account))
     while True:
-        log("✊ 检查账号签到任务：", account)
         tasks = monitor.get_task_list()
+        log("✊ 检查账号签到任务：", account, tasks)
         for task in tasks:
             if monitor.checkout(task):
                 log("✌️ 签到成功:", task["courseName"])
