@@ -23,16 +23,16 @@ class Monitor:
 
     checkouted = set()
 
-    def __init__(self, cookie, classes):
+    def __init__(self, cfg, ac):
 
-        self.cookie = cookie
-
+        self.cookie = cfg["cookie"]
+        self.ac = ac
         self.session = requests.session()
         self.session.headers = {
-            "Cookie": cookie,
+            "Cookie": self.cookie,
         }
 
-        self.classes = classes
+        self.classes = cfg["classes"]
 
     def get_task_list(self):
 
@@ -44,7 +44,8 @@ class Monitor:
 
             soup = BeautifulSoup(res.content, "html.parser", from_encoding="utf-8")
 
-            tasks_node = soup.select("#startList > div > div")
+            tasks_node = soup.select("#endList > div > div")
+
 
             tasks = []
 
@@ -61,7 +62,7 @@ class Monitor:
                     "courseId": c["courseId"],
                     "courseName": c.get("courseName"),
                 })
-            return tasks
+        return tasks
 
     def checkout(self, task):
         if task["activeId"] in self.checkouted:
@@ -73,7 +74,7 @@ class Monitor:
         if "签到成功" in res.text:
             self.checkouted.add(task["activeId"])
             with open("index.html", "a+") as file:
-                file.write(str(datetime.now()) + " 签到成功：" + task["courseName"] + "\n<br>")
+                file.write(str(datetime.now()) + self.ac + " 签到成功：" + task["courseName"] + "\n<br>")
             return True
         else:
             return False
@@ -85,7 +86,7 @@ class Monitor:
         return self.session.get(url, allow_redirects=False).status_code == 302
 
 def account_task(account):
-    monitor = Monitor(config[account]["cookie"], config[account]["classes"])
+    monitor = Monitor(config[account], account)
     if monitor.check_expire():
         log("👮‍♀️ {}Cookie已过期，停止监控".format(account))
         return
@@ -96,7 +97,7 @@ def account_task(account):
         log("✊ 检查账号签到任务：", account, tasks)
         for task in tasks:
             if monitor.checkout(task):
-                log("✌️ 签到成功:", task["courseName"])
+                log("✌️ 签到成功:", account, task["courseName"])
 
         time.sleep(10)
 
@@ -107,8 +108,6 @@ if __name__ == "__main__":
         thr.start()
 
     log("👌 线程启动完毕！")
-
-
 
 
 
