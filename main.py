@@ -36,18 +36,13 @@ class Monitor:
 
     def get_task_list(self):
 
-
+        tasks = []
         for c in self.classes:
             url = base_url.format(courseId=c["courseId"], jclassId=c["jclassId"])
 
             res = self.session.get(url)
-
             soup = BeautifulSoup(res.content, "html.parser", from_encoding="utf-8")
-
-            tasks_node = soup.select("#endList > div > div")
-
-
-            tasks = []
+            tasks_node = soup.select("#startList > div > div")
 
             for node in tasks_node:
                 task_type = node.select("[shape='rect']")[0].text.strip()
@@ -108,6 +103,8 @@ if __name__ == "__main__":
         thr.start()
 
     log("👌 线程启动完毕！")
+
+
 
 
 
