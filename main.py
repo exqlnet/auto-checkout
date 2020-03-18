@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import requests
 import json
 from threading import Thread
@@ -5,10 +6,12 @@ from datetime import datetime
 import time
 from bs4 import BeautifulSoup
 
+from getCourseId import getCourse
+
 
 base_url = "https://mobilelearn.chaoxing.com/widget/pcpick/stu/index?courseId={courseId}&jclassId={jclassId}"
 
-with open("./config.json", "r") as file:
+with open("./config.json", "r", encoding='UTF-8') as file:
     config = json.load(file)
 
 def log(*args, **kwargs):
@@ -31,8 +34,10 @@ class Monitor:
         self.session.headers = {
             "Cookie": self.cookie,
         }
+        with open ("./classes_" + ac +".json", "r") as file:
+            classes = json.load(file)
 
-        self.classes = cfg["classes"]
+        self.classes = classes
 
     def get_task_list(self):
 
@@ -81,12 +86,15 @@ class Monitor:
         return self.session.get(url, allow_redirects=False).status_code == 302
 
 def account_task(account):
+    getCourse(account,config[account]["cookie"])
     monitor = Monitor(config[account], account)
     if monitor.check_expire():
         log("👮‍♀️ {}Cookie已过期，停止监控".format(account))
         return
     else:
         log("✅ {}账号Cookie正常".format(account))
+
+
     while True:
         tasks = monitor.get_task_list()
         log("✊ 检查账号签到任务：", account, tasks)
